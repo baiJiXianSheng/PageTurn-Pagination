@@ -1,0 +1,99 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+.page-info {
+    height: 72px;
+    padding-left: 31px;
+    padding-right: 32px;
+    font-size:14px;
+    font-family:Source Han Sans SC;
+    font-weight:400;
+    color:rgba(153,153,153,1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.page-info .record-text {
+    /* float: left; */
+}
+.page-info .page-turn {
+    /* float: right; */
+}
+.pre-page, .next-page {
+    width:32px;
+    height:32px;
+    border:1px solid rgba(217,217,217,1);
+    border-radius:4px;
+    text-align: center;
+    line-height: 32px;
+    font-size:14px;
+    font-family:Source Han Sans SC;
+    font-weight:400;
+    color:rgba(34,34,34,1);
+    margin-left: 8px;
+    cursor: pointer;
+    position: relative;
+}
+.page-info .page-turn .pre-page::before, .next-page::before {
+    width:8px;
+    height:14px;
+    color: #D9D9D9;
+    position: absolute;
+}
+.page-info .page-turn select {
+    width:84px;
+    height:32px;
+    border:1px solid rgba(217,217,217,1);
+    border-radius:4px;
+    margin-left: 8px;
+}
+.page-info .page-turn .fl {
+    float: left;
+}
+.page-info .page-turn ul {
+    list-style: none;
+}
+.page-info .page-turn ul li {
+    float: left;
+    width:32px;
+    height:32px;
+    border:1px solid rgba(217,217,217,1);
+    border-radius:4px;
+    text-align: center;
+    line-height: 32px;
+    font-size:14px;
+    font-family:Source Han Sans SC;
+    font-weight:400;
+    color:rgba(34,34,34,1);
+    margin-left: 8px;
+    cursor: pointer;
+}
+.user-noselect-text {
+    /* 禁止选中文本 */
+    -moz-user-select: none; /*火狐*/
+    -webkit-user-select: none; /*webkit浏览器*/
+    -ms-user-select: none; /*IE10*/
+    -khtml-user-select: none; /*早期浏览器*/
+    user-select: none;
+}
+.page-info .page-turn ul li.active {
+    color:#096DD9;
+    border-color: #096DD9;
+}
+.page-info .page-turn .jumpto {
+    margin-left: 8px;
+}
+.page-info .page-turn .jumpto input {
+    width: 32px;
+    height: 32px;
+    border:1px solid rgba(217,217,217,1);
+    border-radius:4px;
+    line-height: 32px;
+    font-size:14px;
+    font-family:Source Han Sans SC;
+    font-weight:400;
+    color:rgba(34,34,34,1);
+    margin: 0 8px;
+    text-align: center;
+}
