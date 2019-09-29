@@ -19,6 +19,13 @@ var PageTurn = (function () {
                 PageSize: 10 // 每页消息数量
             },
             liCounts: 5, // li 列表数量
+
+            navTabId: "#nav-main", // 栏目容器Id
+            navData: [{ name: "栏目1", id: 1000 }, { name: "栏目2", id: 1001 }, { name: "栏目3", id: 1003 }], // 栏目标签
+            navIndex: 0, // 当前栏目索引
+            disableNav: false, // 是否禁用一级栏目
+            onChangeNav: function (index, id, mypageturn) {}, // 切换栏目事件，参数：index 当前点击的li索引，id 当前点击的li所对应的栏目id，mypageturn 插件实例
+            
             selectArr: [10, 20], // 每页数量option选项
             disableJump: false, // 是否禁用页码跳转
             disableOptions: false, // 是否禁用option选项
@@ -26,8 +33,8 @@ var PageTurn = (function () {
             onPrePage: function (pageIndex) {}, // 上一页按钮时触发，参数：pageIndex 点击上一页后的当前页码
             onNextPage: function (pageIndex) {}, // 下一页按钮时触发，参数：pageIndex 点击下一页后的当前页码
             onJumpTo: function (pageIndex) {}, // （回车键）跳转时对应页码时触发，参数：跳转后的当前页码
-            onInit: function (pageturn) {}, // 插件初始化结束
-            onClickItem: function (index, pageIndex) {} // 点击 li 时触发，参数：index 点击的li在ul中的索引, pageindex 点击的li对应的页码
+            onInit: function (instance) {}, // 插件初始化结束，参数：instance 插件实例
+            onClickItem: function (index, pageIndex) {} // 点击页码时触发，参数：index 点击的li在ul中的索引, pageIndex 点击的li对应的页码
         }
 
         this.dom = document.querySelector(domId); // 容器节点
@@ -44,25 +51,28 @@ var PageTurn = (function () {
         }
 
         console.log(this.options);
+        
+        this.totalPage = 1; // 总页数
 
         this._init();
     }
 
     PageTurn.prototype._init = function () {
-        var str = '<div class="record-text">共<span id="totalCount"></span>条记录 第<span id="curPageIndex">1</span>/<span id="totalPage">1</span>页</div><div class="page-turn"><div class="pre-page fl user-noselect-text">&lt;</div><ul id="ul-tab" class="fl"></ul><div class="next-page fl user-noselect-text">&gt;</div>'+ (this.options.disableOptions ? '' : '<select class="fl" name="" id="everyPageNum"></select>') + (this.options.disableJump ? '' : '<div class="fl jumpto">跳至<input type="text" id="jumto-input" value="1">页</div>') + '</div>';
+        var options = this.options;
+
+        var str = '<div class="record-text">共<span id="totalCount"></span>条记录 第<span id="curPageIndex">1</span>/<span id="totalPage">1</span>页</div><div class="page-turn"><div class="pre-page fl user-noselect-text">&lt;</div><ul id="ul-tab" class="fl"></ul><div class="next-page fl user-noselect-text">&gt;</div>'+ (options.disableOptions ? '' : '<select class="fl" name="" id="everyPageNum"></select>') + (options.disableJump ? '' : '<div class="fl jumpto">跳至<input type="text" id="jumto-input" value="1">页</div>') + '</div>';
 
         this.dom.innerHTML = str;
         this.dom.classList.add("page-info");
 
-        var _tempCount = this.options.liCounts;
+        var _tempCount = options.liCounts;
         this.liCountsArr = new Array(_tempCount).fill(0).map(function () { return --_tempCount });
-        
-        this.totalPage = 1; // 总页数
 
         this.initDom();
 
         this.refreshList();
-        this.options.onInit(this);
+
+        options.onInit(this);
     }
 
     PageTurn.prototype.initEvent = function () {
@@ -70,6 +80,30 @@ var PageTurn = (function () {
         var self = this,
             options = self.options,
             pagination = options.pagination;
+
+        // 栏目切换
+        if (!options.disableNav && this.navUl) {
+            var lis = self.navUl.getElementsByTagName("li");
+            
+            self.navUl.onclick = function (evt) {
+                if (evt.target.tagName.toLowerCase() === "li") {
+                    var id = evt.target.getAttribute("data-id"),
+                        index = 0;
+                    
+                    for (var i = 0, len = lis.length; i < len; i++) {
+                        
+                        if (lis[i] === evt.target) {
+                            index = i;
+                            lis[i].classList.add("active");
+                        } else {
+                            lis[i].classList.remove("active");
+                        }
+                    }
+
+                    self.options.onChangeNav(index, id, self);
+                }
+            }
+        }
         
         if (!options.disableOptions) {
             // 切换每页数量
@@ -105,10 +139,10 @@ var PageTurn = (function () {
         }
 
         // 点击li列表页数
-        self.ulDom.addEventListener("click", self.changeLi.bind(self, pagination)); 
+        self.ulDom.addEventListener("click", self.setHighlight.bind(self, pagination)); 
 
+        // 跳转页码
         if (!options.disableJump) {
-            // 跳转页码
             document.onkeyup = function (evt) {
                 // console.log("evt.keyCode:", evt.keyCode);
                 if (evt.keyCode == 13) {
@@ -147,10 +181,38 @@ var PageTurn = (function () {
             totalCount = options.totalCount,
             pagination = options.pagination;
 
+        // 栏目
+        if (!options.disableNav && options.navTabId) {
+            var navUl = document.createElement("ul"),
+                navContainer = document.querySelector(options.navTabId);
+
+            if (!navContainer) return console.error("'" + options.navTabId + "' is not fonud by querySelect function!\nPlease make sure the `navTabId` param is like '#domId' or '.domClass'.");
+            
+            for (var i = 0, len = options.navData.length; i < len; i++) {
+                var data = options.navData[i],
+                    li = document.createElement("li");
+
+                if (options.navIndex == i)
+                    li.classList.add("active");
+
+                li.innerHTML = data.name;
+                li.setAttribute("data-id", data.id);
+                navUl.appendChild(li);
+            }
+
+            navUl.classList.add("second-tab");
+
+            this.navUl = navUl;
+
+            navContainer.append(navUl);
+        }
+
+        // 跳转
         if (!options.disableJump) {
             this.jumtoInputDom = document.getElementById("jumto-input");
         }
 
+        // 每页数量
         if (!options.disableOptions) {
             this.everyPageNumDom = document.getElementById("everyPageNum");
 
@@ -171,14 +233,21 @@ var PageTurn = (function () {
         this.initEvent();
     }
 
+    PageTurn.prototype.refresh = function (totalCount) {
+        this.options.totalCount = totalCount;
+        this.options.pagination.PageIndex = 1; // 切换栏目时重置为第一页
+        this.totalCountDom.innerHTML = totalCount;
+
+        this.refreshList();
+    }
+
     PageTurn.prototype.refreshList = function (notrerenderLi) {
         var options = this.options,
-            totalPage = this.totalPage,
             totalCount = options.totalCount,
             pagination = options.pagination,
             liCounts = options.liCounts;
 
-        totalPage = this.totalPage = Math.ceil(totalCount / pagination.PageSize) > 0 ? Math.ceil(totalCount / pagination.PageSize) : 1;
+        var totalPage = this.totalPage = Math.ceil(totalCount / pagination.PageSize) > 0 ? Math.ceil(totalCount / pagination.PageSize) : 1;
 
         this.totalPageDom.innerHTML = totalPage;
 
@@ -209,6 +278,8 @@ var PageTurn = (function () {
                 this.ulDom.appendChild(li);
             }
 
+            this.liDoms = this.ulDom.getElementsByTagName("li");
+
         }
         
         if (totalPage <= 1) {
@@ -221,24 +292,25 @@ var PageTurn = (function () {
         
     }
 
-    PageTurn.prototype.changeLi = function changeLi (pagination, evt) {
+    PageTurn.prototype.setHighlight = function (pagination, evt) {
         // console.log(...arguments);
-        var lis = this.ulDom.getElementsByTagName("li");
         
-        if (evt.target.tagName.toLowerCase() == "li") {
-            var pageindex = evt.target.getAttribute("data-index"),
+        if (evt.target.tagName.toLowerCase() === "li") {
+            var lis = this.liDoms,
+                pageindex = evt.target.getAttribute("data-index"),
                 index = 0;
             
             for (var i = 0, len = lis.length; i < len; i++) {
-                lis[i].classList.remove("active");
-                
-                if (lis[i] === evt.target)
+                if (lis[i] === evt.target) {
                     index = i;
+                    lis[i].classList.add("active");
+                } else {
+                    lis[i].classList.remove("active");
+                }
             }
 
             this.options.onClickItem(index, pageindex);
-
-            evt.target.classList.add("active");
+            
             pagination.PageIndex = Number(pageindex);
 
             this.refreshList(true);

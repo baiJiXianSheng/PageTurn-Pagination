@@ -2,6 +2,35 @@
     margin: 0;
     padding: 0;
 }
+
+.second-tab {
+    height: 40px;
+    margin-top: 32px;
+    list-style: none;
+}
+.second-tab li {
+    float: left;
+    width:100px;
+    height:40px;
+    line-height: 40px;
+    text-align: center;
+    background:#efefef;
+    border-radius:8px 8px 0px 0px;
+    margin-left: 12px;
+    font-size:16px;
+    font-family:Source Han Sans SC;
+    font-weight:400;
+    color:rgba(153,153,153,1);
+    cursor: pointer;
+}
+.second-tab li:nth-of-type(1) {
+    margin-left: 0;
+}
+.second-tab li.active {
+    background: #0073E3;
+    color: #fff;
+}
+
 .page-info {
     height: 72px;
     padding-left: 31px;
