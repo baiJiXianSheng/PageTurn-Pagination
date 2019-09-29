@@ -27,6 +27,8 @@
                 // 记得传递 totalCount（新数据的length） 并调用 mypageturn.refresh(totalCount) 刷新一下哦~ 
                 mypageturn.refresh(totalCount);
             }, 
+
+            disableTips: false, // 是否禁用 记录-页码提示
             
             selectArr: [10, 20], // 每页数量option选项
             disableJump: false, // 是否禁用页码跳转

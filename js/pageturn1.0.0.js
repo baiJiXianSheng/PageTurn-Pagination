@@ -26,6 +26,8 @@ var PageTurn = (function () {
             disableNav: false, // 是否禁用一级栏目
             onChangeNav: function (index, id, mypageturn) {}, // 切换栏目事件，参数：index 当前点击的li索引，id 当前点击的li所对应的栏目id，mypageturn 插件实例
             
+            disableTips: false, // 是否禁用 记录-页码提示
+
             selectArr: [10, 20], // 每页数量option选项
             disableJump: false, // 是否禁用页码跳转
             disableOptions: false, // 是否禁用option选项
@@ -60,7 +62,7 @@ var PageTurn = (function () {
     PageTurn.prototype._init = function () {
         var options = this.options;
 
-        var str = '<div class="record-text">共<span id="totalCount"></span>条记录 第<span id="curPageIndex">1</span>/<span id="totalPage">1</span>页</div><div class="page-turn"><div class="pre-page fl user-noselect-text">&lt;</div><ul id="ul-tab" class="fl"></ul><div class="next-page fl user-noselect-text">&gt;</div>'+ (options.disableOptions ? '' : '<select class="fl" name="" id="everyPageNum"></select>') + (options.disableJump ? '' : '<div class="fl jumpto">跳至<input type="text" id="jumto-input" value="1">页</div>') + '</div>';
+        var str = (options.disableTips ? '' : '<div class="record-text">共<span id="totalCount"></span>条记录 第<span id="curPageIndex">1</span>/<span id="totalPage">1</span>页</div>') + '<div class="page-turn"><div class="pre-page fl user-noselect-text">&lt;</div><ul id="ul-tab" class="fl"></ul><div class="next-page fl user-noselect-text">&gt;</div>'+ (options.disableOptions ? '' : '<select class="fl" name="" id="everyPageNum"></select>') + (options.disableJump ? '' : '<div class="fl jumpto">跳至<input type="text" id="jumto-input" value="1">页</div>') + '</div>';
 
         this.dom.innerHTML = str;
         this.dom.classList.add("page-info");
@@ -99,6 +101,8 @@ var PageTurn = (function () {
                             lis[i].classList.remove("active");
                         }
                     }
+
+                    self.options.navIndex = index;
 
                     self.options.onChangeNav(index, id, self);
                 }
@@ -166,12 +170,9 @@ var PageTurn = (function () {
     }
 
     PageTurn.prototype.initDom = function () {
-        this.totalPageDom = document.getElementById("totalPage");
         this.ulDom = document.getElementById("ul-tab");
         this.prePageDom = document.getElementsByClassName("pre-page")[0];
         this.nextPageDom = document.getElementsByClassName("next-page")[0];
-        this.totalCountDom = document.getElementById("totalCount");
-        this.curPageIndexDom = document.getElementById("curPageIndex");
 
         this.prePageDom.setAttribute("unselectable", "on"); // < IE 10，禁止选中文本
         this.nextPageDom.setAttribute("unselectable", "on"); // < IE 10，禁止选中文本
@@ -180,6 +181,14 @@ var PageTurn = (function () {
             selectArr = options.selectArr,
             totalCount = options.totalCount,
             pagination = options.pagination;
+
+        if (!options.disableTips) {
+            this.totalPageDom = document.getElementById("totalPage");
+            this.totalCountDom = document.getElementById("totalCount");
+            this.curPageIndexDom = document.getElementById("curPageIndex");
+            
+            this.totalCountDom.innerHTML = totalCount;
+        }
 
         // 栏目
         if (!options.disableNav && options.navTabId) {
@@ -228,15 +237,15 @@ var PageTurn = (function () {
 
         }
 
-        this.totalCountDom.innerHTML = totalCount;
-
         this.initEvent();
     }
 
     PageTurn.prototype.refresh = function (totalCount) {
         this.options.totalCount = totalCount;
         this.options.pagination.PageIndex = 1; // 切换栏目时重置为第一页
-        this.totalCountDom.innerHTML = totalCount;
+        
+        if (!this.options.disableTips)
+            this.totalCountDom.innerHTML = totalCount;
 
         this.refreshList();
     }
@@ -249,10 +258,11 @@ var PageTurn = (function () {
 
         var totalPage = this.totalPage = Math.ceil(totalCount / pagination.PageSize) > 0 ? Math.ceil(totalCount / pagination.PageSize) : 1;
 
-        this.totalPageDom.innerHTML = totalPage;
-
-        this.curPageIndexDom.innerHTML = pagination.PageIndex;
-
+        if (!options.disableTips) {
+            this.totalPageDom.innerHTML = totalPage;
+            this.curPageIndexDom.innerHTML = pagination.PageIndex;
+        }
+        
         // 点击 li 时无需删除重绘
         if (!notrerenderLi) {
             this.ulDom.innerHTML = "";
