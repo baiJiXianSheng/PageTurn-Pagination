@@ -30,6 +30,8 @@
 
             disableTips: false, // 是否禁用 记录-页码提示
             
+            prePageIcon: "", // 上一页按钮图标
+            nextPageIcon: "", // 下一页按钮图标
             selectArr: [10, 20], // 每页数量option选项
             disableJump: false, // 是否禁用页码跳转
             disableOptions: false, // 是否禁用option选项

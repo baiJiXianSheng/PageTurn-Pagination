@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>PageTurn</title>
+    <title>PageTurn-Demo</title>
     <link rel="stylesheet" href="css/pageturn.css">
     <style>
         .test-article {
@@ -23,7 +23,7 @@
     <div class="test-article"></div>
     <div id="pageturn-container"></div>
 
-    <script src="js/pageturn1.0.0.js"></script>
+    <script src="js/pageturn1.0.1.js"></script>
     <script>
         var colors = ["#999", "deepskyblue", "deeppink", "darkgreen"],
             articleDiv = document.getElementsByClassName("test-article")[0];
@@ -49,6 +49,8 @@
                 
                 disableTips: false, // 是否禁用 记录-页码提示
 
+                prePageIcon: "", // 上一页按钮图标
+                nextPageIcon: "", // 下一页按钮图标
                 selectArr: [10, 20], // 每页数量option选项
                 disableJump: false, // 是否禁用页码跳转
                 disableOptions: false, // 是否禁用option选项
@@ -65,6 +67,8 @@
                 // PageSize: 20 // 每页消息数量
             },
             liCounts: 6, // li 列表数量
+            prePageIcon: "img/prev-btn.png",
+            // nextPageIcon: "img/next-btn.png",
             selectArr: [10, 20, 30],
             // disableJump: true,
             // disableOptions: true,

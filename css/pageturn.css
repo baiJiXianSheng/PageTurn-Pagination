@@ -3,6 +3,11 @@
     padding: 0;
 }
 
+.pageturn-box {
+    width: 100%;
+    height: 100%;
+}
+
 .second-tab {
     height: 40px;
     margin-top: 32px;
@@ -42,6 +47,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    box-sizing: border-box;
 }
 .page-info .record-text {
     /* float: left; */
@@ -63,6 +69,14 @@
     margin-left: 8px;
     cursor: pointer;
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.pre-page img, .next-page img {
+    border: none;
+    max-width: 30px;
+    max-height: 30px;
 }
 .page-info .page-turn .pre-page::before, .next-page::before {
     width:8px;
